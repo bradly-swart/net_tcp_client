@@ -51,7 +51,7 @@ module Net
     attr_reader :server
 
     attr_accessor :read_timeout, :connect_timeout, :connect_retry_count,
-      :retry_count, :connect_retry_interval, :server_selector, :close_on_error, :use_ssl, :expected_cert_path
+      :retry_count, :connect_retry_interval, :server_selector, :close_on_error, :use_ssl, :cert_path, :cert_key_path,:expected_cert_path
 
     # Returns [TrueClass|FalseClass] Whether send buffering is enabled for this connection
     attr_reader :buffered
@@ -238,7 +238,13 @@ module Net
       @check_length           = check_length.nil? ? false : check_length
 
       expected_cert_path      = params.delete(:expected_cert_path)
-      @expected_cert_path     = expected_cert_path.nil? ? '/etc/ssl/certs' : expected_cert_path
+      @expected_cert_path     = expected_cert_path.nil? ? '/etc/ssl/certs/expected_cert.pem' : expected_cert_path
+
+      cert_path               = params.delete(:cert_path)
+      @cert_path              = cert_path.nil? ? '/etc/ssl/certs/certificate.pem' : cert_path
+
+      cert_key_path           = params.delete(:cert_key_path)
+      @cert_key_path          = cert_key_path.nil? ? '/etc/ssl/certs/private_key.pem' : cert_key_path
 
       @connect_retry_count    = params.delete(:connect_retry_count) || 10
       @retry_count            = params.delete(:retry_count) || 3
@@ -616,8 +622,8 @@ module Net
             #context.verify_mode = OpenSSL::SSL::VERIFY_NONE
             logger.warn "Expecting cert: #{@expected_cert_path}"
             # context.cert = expected_cert
-            context.cert = OpenSSL::X509::Certificate.new(File.open("/Users/brad/projects/powerplus/net_tcp_client/test/certificate.pem"))
-            context.key = OpenSSL::PKey::RSA.new(File.open("/Users/brad/projects/powerplus/net_tcp_client/test/private_key.pem"))
+            context.cert = OpenSSL::X509::Certificate.new(File.open(@cert_path))
+            context.key = OpenSSL::PKey::RSA.new(File.open(@cert_key_path))
             @socket = OpenSSL::SSL::SSLSocket.new(tcp_socket, context)
             @socket.sync_close = true
             # check if the server cert matches the one we expect.
