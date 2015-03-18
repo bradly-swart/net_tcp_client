@@ -611,8 +611,8 @@ module Net
               end
             end
             context = OpenSSL::SSL::SSLContext.new
-            # context.ssl_version = :SSLv23
-            context.ssl_version = :SSLv3
+            context.ssl_version = :SSLv23
+            #context.ssl_version = :SSLv3
             # context.ssl_version = :TLSv1
             #p context.ciphers
             #context.ciphers = ["ECDHE-RSA-AES256-GCM-SHA384", "TLSv1/SSLv3", 256, 256]
